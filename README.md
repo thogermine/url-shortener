@@ -62,12 +62,66 @@ The Controller layer must therefore collect user information somehow along with 
 Special attention must be given to the followToken. This is where the whole business values of the service lies. The followToken operation must:
   - send a status code 301.
   - send a location header with the targetUrl of the token.
+  - the Token can be protected by a "protectToken", so you should support the client providing one _if required_.
 
 #### Solution
 See: src/main/java/dk/lundogbendsen/springbootcourse/urlshortener/controller/UserController.java
 See: src/main/java/dk/lundogbendsen/springbootcourse/urlshortener/controller/TokenController.java
 See: src/main/java/dk/lundogbendsen/springbootcourse/urlshortener/controller/FollowTokenController.java
 
-### Exercise 3: Better Exception handling
+### Exercise 3: Exception handling for Service Layer
+At this point we have a working API, but error handling could be better.
+
+When the client violates the business rules, they get a 500 error without much information.
+
+In this exercise we will upgrade the exception handling ny introducing a RestController advice that handles any service exception.
+
+Inspecting the Exceptions from the business layer, we could categorize them into:
+"Not found" (status code 404), "conflict" (status code 409), "validation" (status code 422), "security" (status code 401).
+
+
+- Make a class ControllerAdvicerServiceLayer and annotate it with `@RestControllerAdvice`. This instructs Spring to look in this class for finding ExceptionHandlers.
+
+- For each category you decide, make an exception handler that receives the exceptions in the category.
+- The exception handler should explicitly denote the list of Exceptions that it handles in the @ExceptionHandler annotation.
+- It must set an appropriate Status Code (using @ResponseStatus).
+- It must return a Json object with a "message" key with an appropriate value.
+
+
+
+#### Solution
+```java
+@RestControllerAdvice
+public class ControllerAdvicerServiceLayer {
+
+    @ExceptionHandler({TokenAlreadyExistsException.class, UserExistsException.class})
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleConflict(Exception exception) {
+        if (exception instanceof TokenAlreadyExistsException) {
+            return Map.of("message", "The token already exists");
+        } else {
+            return Map.of("message", "The user already exists");
+        }
+    }
+
+    @ExceptionHandler({TokenNotFoundExistsException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleNotFound(TokenNotFoundExistsException exception) {
+        return Map.of("message", "The token was not found");
+    }
+
+    @ExceptionHandler({IllegalTargetUrlException.class, IllegalTokenNameException.class, InvalidTargetUrlException.class, TokenTargetUrlIsNullException.class})
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public Map<String, String> handleValidation(Exception exception) {
+        return Map.of("message", "The token did not validate", "validation-type", exception.getClass().getSimpleName());
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> handleSecurity(AccessDeniedException exception, HttpServletRequest request) {
+        return Map.of("message", "The operation is not allowed", "path", request.getRequestURI());
+    }
+}
+```
 
 

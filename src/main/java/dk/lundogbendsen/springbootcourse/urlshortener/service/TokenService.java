@@ -20,7 +20,7 @@ public class TokenService {
 
     public List<Token> listUserTokens(User user) {
         if (user == null) {
-            throw new UserRequiredException();
+            throw new AccessDeniedException();
         }
         final List<Token> userTokens = this.tokens.values().stream().filter(token -> token.getUser().getUsername().equals(user.getUsername())).collect(Collectors.toUnmodifiableList());
         return userTokens;
@@ -28,14 +28,14 @@ public class TokenService {
 
     public void deleteTokens(User user) {
         if (user == null) {
-            throw new UserRequiredException();
+            throw new AccessDeniedException();
         }
         tokens.values().removeIf(token -> token.getUser().getUsername().equals(user.getUsername()));
     }
 
     public Token create(String theToken, String targetUrl, String protectToken, User user) {
         if (user == null) {
-            throw new UserRequiredException();
+            throw new AccessDeniedException();
         }
         if (theToken.equals("token")) {
             throw new IllegalTokenNameException();
@@ -62,7 +62,7 @@ public class TokenService {
 
     public Token update(String theToken, String targetUrl, String protectToken, User user) {
         if (user == null) {
-            throw new UserRequiredException();
+            throw new AccessDeniedException();
         }
         final Token token = tokens.get(theToken);
         if (token == null) {
@@ -89,7 +89,7 @@ public class TokenService {
 
     public void deleteToken(String theToken, String userName) {
         if (userName == null) {
-            throw new UserRequiredException();
+            throw new AccessDeniedException();
         }
         final Token token = tokens.get(theToken);
         if (!token.getUser().getUsername().equals(userName)) {
@@ -112,7 +112,7 @@ public class TokenService {
 
     public Token getToken(String theToken, String username) {
         if (username == null) {
-            throw new UserRequiredException();
+            throw new AccessDeniedException();
         }
         final Token token = tokens.get(theToken);
         if (!token.getUser().getUsername().equals(username)) {
