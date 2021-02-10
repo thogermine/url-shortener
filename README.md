@@ -88,6 +88,10 @@ Inspecting the Exceptions from the business layer, we could categorize them into
 - It must return a Json object with a "message" key with an appropriate value.
 
 
+Import the postman collection: `UrlShortener v1.postman_collection.json`
+
+Use it to test that your solution works!
+
 
 #### Solution
 ```java
@@ -304,6 +308,12 @@ Looking at the TokenController we see that most operations require a username wh
 - Remove the `@RequestHeader String username` from all method signatures.
 - Where the TokenService require a userName or a User, use the SecurityContext to get the User and use it directly or extract the username from the User instance.
 
+Now it is time to test the new solution using Basic Auth.
+
+Import the postman collection: `UrlShortener v2.postman_collection.json`
+
+Use it to test that your solution works!
+
 #### Solution step 5
 
 ```java
@@ -366,3 +376,5 @@ public class TokenController {
   }
 }
 ```
+
+
