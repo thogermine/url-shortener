@@ -2,27 +2,30 @@ package dk.lundogbendsen.springbootcourse.urlshortener.service;
 
 import dk.lundogbendsen.springbootcourse.urlshortener.model.Token;
 import dk.lundogbendsen.springbootcourse.urlshortener.model.User;
+import dk.lundogbendsen.springbootcourse.urlshortener.repositories.TokenRepository;
 import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class TokenService {
-    private HashMap<String, Token> tokens = new HashMap<>();
+    @Autowired
+    TokenRepository tokenRepository;
+
 
 
     public List<Token> listUserTokens(User user) {
         if (user == null) {
             throw new AccessDeniedException();
         }
-        final List<Token> userTokens = this.tokens.values().stream().filter(token -> token.getUser().getUsername().equals(user.getUsername())).collect(Collectors.toUnmodifiableList());
+        final List<Token> userTokens = tokenRepository.findAllByUser(user);
         return userTokens;
     }
 
@@ -30,7 +33,7 @@ public class TokenService {
         if (user == null) {
             throw new AccessDeniedException();
         }
-        tokens.values().removeIf(token -> token.getUser().getUsername().equals(user.getUsername()));
+        tokenRepository.deleteAllByUser(user);
     }
 
     public Token create(String theToken, String targetUrl, String protectToken, User user) {
@@ -40,7 +43,8 @@ public class TokenService {
         if (theToken.equals("token")) {
             throw new IllegalTokenNameException();
         }
-        if (tokens.containsKey(theToken)) {
+        Optional<Token> existingToken = tokenRepository.findById(theToken);
+        if (existingToken.isPresent()) {
             throw new TokenAlreadyExistsException();
         }
         if (targetUrl == null) {
@@ -56,7 +60,7 @@ public class TokenService {
         }
 
         final Token token = Token.builder().token(theToken).targetUrl(targetUrl).protectToken(protectToken).user(user).build();
-        tokens.put(theToken, token);
+        tokenRepository.save(token);
         return token;
     }
 
@@ -64,13 +68,13 @@ public class TokenService {
         if (user == null) {
             throw new AccessDeniedException();
         }
-        final Token token = tokens.get(theToken);
-        if (token == null) {
-            throw new TokenNotFoundExistsException();
+
+        final Optional<Token> tokenOptional = tokenRepository.findByTokenAndUser(theToken, user);
+        if (!tokenOptional.isPresent()) {
+            throw new TokenNotFoundException();
         }
-        if (!token.getUser().getUsername().equals(user.getUsername())) {
-            throw new AccessDeniedException();
-        }
+
+        final Token token = tokenOptional.get();
         if (targetUrl == null) {
             targetUrl = token.getTargetUrl();
         }
@@ -82,42 +86,29 @@ public class TokenService {
         } catch (URISyntaxException e) {
             throw new InvalidTargetUrlException();
         }
+
         token.setTargetUrl(targetUrl);
         token.setProtectToken(protectToken);
-        return token;
+        return tokenRepository.save(token);
     }
 
-    public void deleteToken(String theToken, String userName) {
-        if (userName == null) {
-            throw new AccessDeniedException();
-        }
-        final Token token = tokens.get(theToken);
-        if (!token.getUser().getUsername().equals(userName)) {
-            throw new AccessDeniedException();
-        }
-        tokens.remove(theToken);
+    public void deleteToken(String theToken, User user) {
+        tokenRepository.deleteByUser(theToken, user);
     }
 
     public String resolveToken(String theToken, String protectToken) {
-        final Token token = tokens.get(theToken);
-        if (token == null) {
-            throw new TokenNotFoundExistsException();
+        final Optional<Token> token = tokenRepository.findByTokenAndProtectToken(theToken, protectToken);
+        if (!token.isPresent()) {
+            throw new TokenNotFoundException();
         }
-        if (token.getProtectToken() != null && !token.getProtectToken().equals(protectToken)) {
-            throw new AccessDeniedException();
-        }
-
-        return token.getTargetUrl();
+        return token.get().getTargetUrl();
     }
 
-    public Token getToken(String theToken, String username) {
-        if (username == null) {
-            throw new AccessDeniedException();
+    public Token getToken(String theToken, User user) {
+        final Optional<Token> token = tokenRepository.findByTokenAndUser(theToken, user);
+        if (!token.isPresent()) {
+            throw new TokenNotFoundException();
         }
-        final Token token = tokens.get(theToken);
-        if (!token.getUser().getUsername().equals(username)) {
-            throw new AccessDeniedException();
-        }
-        return token;
+        return token.get();
     }
 }

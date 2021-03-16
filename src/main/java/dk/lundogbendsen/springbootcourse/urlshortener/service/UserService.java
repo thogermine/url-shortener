@@ -1,36 +1,41 @@
 package dk.lundogbendsen.springbootcourse.urlshortener.service;
 
 import dk.lundogbendsen.springbootcourse.urlshortener.model.User;
+import dk.lundogbendsen.springbootcourse.urlshortener.repositories.UserRepository;
 import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.UserExistsException;
+import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
+import java.util.Optional;
 
 @Service
 public class UserService {
     @Autowired
     private TokenService tokenService;
-    private HashMap<String, User> users = new HashMap<>();
+    @Autowired
+    private UserRepository userRepository;
 
     public User create(String userName, String password) {
-        if (users.containsKey(userName)) {
+        if (userRepository.existsById(userName)) {
             throw new UserExistsException();
         }
         final User user = User.builder().username(userName).password(password).build();
-        users.put(userName, user);
+        userRepository.save(user);
         return user;
     }
 
+    @Transactional
     public void delete(String userName) {
-        final User user = users.get(userName);
-        if (user != null) {
-            users.remove(userName);
-            tokenService.deleteTokens(user);
+        final Optional<User> user = userRepository.findById(userName);
+        if (user.isPresent()) {
+            tokenService.deleteTokens(user.get());
+            userRepository.delete(user.get());
         }
     }
 
     public User getUser(String userName) {
-        return users.get(userName);
+        return userRepository.findById(userName).orElseThrow(UserNotFoundException::new);
     }
 }

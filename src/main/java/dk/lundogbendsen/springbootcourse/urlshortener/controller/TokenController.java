@@ -45,13 +45,13 @@ public class TokenController {
     @DeleteMapping("/{token}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String token) {
-        tokenService.deleteToken(token, SecurityContext.getUser().getUsername());
+        tokenService.deleteToken(token, SecurityContext.getUser());
     }
 
     @PutMapping("/{token}/protect")
     @ResponseStatus(HttpStatus.CREATED)
     public void protect(@PathVariable("token") String theToken, @RequestBody Map<String, String> body) {
-        final Token token = tokenService.getToken(theToken, SecurityContext.getUser().getUsername());
+        final Token token = tokenService.getToken(theToken, SecurityContext.getUser());
         String protectToken = body.get("protectToken");
         tokenService.update(theToken, token.getTargetUrl(), protectToken, SecurityContext.getUser());
     }
