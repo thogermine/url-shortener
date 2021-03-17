@@ -66,7 +66,7 @@ public class TokenService {
         }
         final Token token = tokens.get(theToken);
         if (token == null) {
-            throw new TokenNotFoundExistsException();
+            throw new TokenNotFoundException();
         }
         if (!token.getUser().getUsername().equals(user.getUsername())) {
             throw new AccessDeniedException();
@@ -87,12 +87,12 @@ public class TokenService {
         return token;
     }
 
-    public void deleteToken(String theToken, String userName) {
-        if (userName == null) {
+    public void deleteToken(String theToken, User user) {
+        if (user == null) {
             throw new AccessDeniedException();
         }
         final Token token = tokens.get(theToken);
-        if (!token.getUser().getUsername().equals(userName)) {
+        if (!token.getUser().getUsername().equals(user.getUsername())) {
             throw new AccessDeniedException();
         }
         tokens.remove(theToken);
@@ -101,7 +101,7 @@ public class TokenService {
     public String resolveToken(String theToken, String protectToken) {
         final Token token = tokens.get(theToken);
         if (token == null) {
-            throw new TokenNotFoundExistsException();
+            throw new TokenNotFoundException();
         }
         if (token.getProtectToken() != null && !token.getProtectToken().equals(protectToken)) {
             throw new AccessDeniedException();
@@ -110,12 +110,12 @@ public class TokenService {
         return token.getTargetUrl();
     }
 
-    public Token getToken(String theToken, String username) {
-        if (username == null) {
+    public Token getToken(String theToken, User user) {
+        if (user == null) {
             throw new AccessDeniedException();
         }
         final Token token = tokens.get(theToken);
-        if (!token.getUser().getUsername().equals(username)) {
+        if (!token.getUser().getUsername().equals(user.getUsername())) {
             throw new AccessDeniedException();
         }
         return token;
