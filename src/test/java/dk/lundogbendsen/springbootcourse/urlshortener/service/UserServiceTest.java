@@ -34,6 +34,7 @@ class UserServiceTest {
     @Test
     public void getUserTest() {
         when(users.get("user1")).thenReturn(User.builder().username("fakeuser").password("password1").build());
+        when(users.containsKey("user1")).thenReturn(true);
         final User fakeUser = userService.getUser("user1");
         assertEquals("password1", fakeUser.getPassword());
     }
