@@ -109,125 +109,126 @@ TokenService:
 ```java
 @Service
 public class TokenService {
-    private HashMap<String, Token> tokens = new HashMap<>();
+  private HashMap<String, Token> tokens = new HashMap<>();
 
 
-    public List<Token> listUserTokens(User user) {
-        if (user == null) {
-            throw new AccessDeniedException();
-        }
-        final List<Token> userTokens = this.tokens.values().stream().filter(token -> token.getUser().getUsername().equals(user.getUsername())).collect(Collectors.toUnmodifiableList());
-        return userTokens;
+  public List<Token> listUserTokens(User user) {
+    if (user == null) {
+      throw new AccessDeniedException();
+    }
+    final List<Token> userTokens = this.tokens.values().stream().filter(token -> token.getUser().getUsername().equals(user.getUsername())).collect(Collectors.toUnmodifiableList());
+    return userTokens;
+  }
+
+  public void deleteTokens(User user) {
+    if (user == null) {
+      throw new AccessDeniedException();
+    }
+    tokens.values().removeIf(token -> token.getUser().getUsername().equals(user.getUsername()));
+  }
+
+  public Token create(String theToken, String targetUrl, String protectToken, User user) {
+    if (user == null) {
+      throw new AccessDeniedException();
+    }
+    if (theToken.equals("token")) {
+      throw new IllegalTokenNameException();
+    }
+    if (tokens.containsKey(theToken)) {
+      throw new TokenAlreadyExistsException();
+    }
+    if (targetUrl == null) {
+      throw new TokenTargetUrlIsNullException();
+    }
+    if (targetUrl.contains("localhost")) {
+      throw new IllegalTargetUrlException();
+    }
+    try {
+      new URL(targetUrl);
+    } catch (MalformedURLException e) {
+      throw new InvalidTargetUrlException();
     }
 
-    public void deleteTokens(User user) {
-        if (user == null) {
-            throw new AccessDeniedException();
-        }
-        tokens.values().removeIf(token -> token.getUser().getUsername().equals(user.getUsername()));
+    final Token token = Token.builder().token(theToken).targetUrl(targetUrl).protectToken(protectToken).user(user).build();
+    tokens.put(theToken, token);
+    return token;
+  }
+
+  public Token update(String theToken, String targetUrl, String protectToken, User user) {
+    if (user == null) {
+      throw new AccessDeniedException();
+    }
+    final Token token = tokens.get(theToken);
+    if (token == null) {
+      throw new TokenNotFoundException();
+    }
+    if (!token.getUser().getUsername().equals(user.getUsername())) {
+      throw new AccessDeniedException();
+    }
+    if (targetUrl == null) {
+      targetUrl = token.getTargetUrl();
+    }
+    if (targetUrl.contains("localhost")) {
+      throw new IllegalTargetUrlException();
+    }
+    try {
+      new URI(targetUrl);
+    } catch (URISyntaxException e) {
+      throw new InvalidTargetUrlException();
+    }
+    token.setTargetUrl(targetUrl);
+    token.setProtectToken(protectToken);
+    return token;
+  }
+
+  public void deleteToken(String theToken, User user) {
+    if (user == null) {
+      throw new AccessDeniedException();
+    }
+    final Token token = tokens.get(theToken);
+    if (!token.getUser().getUsername().equals(user.getUsername())) {
+      throw new AccessDeniedException();
+    }
+    tokens.remove(theToken);
+  }
+
+  public String resolveToken(String theToken, String protectToken) {
+    final Token token = tokens.get(theToken);
+    if (token == null) {
+      throw new TokenNotFoundException();
+    }
+    if (token.getProtectToken() != null && !token.getProtectToken().equals(protectToken)) {
+      throw new AccessDeniedException();
     }
 
-    public Token create(String theToken, String targetUrl, String protectToken, User user) {
-        if (user == null) {
-            throw new AccessDeniedException();
-        }
-        if (theToken.equals("token")) {
-            throw new IllegalTokenNameException();
-        }
-        if (tokens.containsKey(theToken)) {
-            throw new TokenAlreadyExistsException();
-        }
-        if (targetUrl == null) {
-            throw new TokenTargetUrlIsNullException();
-        }
-        if (targetUrl.contains("localhost")) {
-            throw new IllegalTargetUrlException();
-        }
-        try {
-            new URL(targetUrl);
-        } catch (MalformedURLException e) {
-            throw new InvalidTargetUrlException();
-        }
+    return token.getTargetUrl();
+  }
 
-        final Token token = Token.builder().token(theToken).targetUrl(targetUrl).protectToken(protectToken).user(user).build();
-        tokens.put(theToken, token);
-        return token;
+  public Token getToken(String theToken, User user) {
+    if (user == null) {
+      throw new AccessDeniedException();
     }
-
-    public Token update(String theToken, String targetUrl, String protectToken, User user) {
-        if (user == null) {
-            throw new AccessDeniedException();
-        }
-        final Token token = tokens.get(theToken);
-        if (token == null) {
-            throw new TokenNotFoundExistsException();
-        }
-        if (!token.getUser().getUsername().equals(user.getUsername())) {
-            throw new AccessDeniedException();
-        }
-        if (targetUrl == null) {
-            targetUrl = token.getTargetUrl();
-        }
-        if (targetUrl.contains("localhost")) {
-            throw new IllegalTargetUrlException();
-        }
-        try {
-            new URI(targetUrl);
-        } catch (URISyntaxException e) {
-            throw new InvalidTargetUrlException();
-        }
-        token.setTargetUrl(targetUrl);
-        token.setProtectToken(protectToken);
-        return token;
+    final Token token = tokens.get(theToken);
+    if (!token.getUser().getUsername().equals(user.getUsername())) {
+      throw new AccessDeniedException();
     }
-
-    public void deleteToken(String theToken, String userName) {
-        if (userName == null) {
-            throw new AccessDeniedException();
-        }
-        final Token token = tokens.get(theToken);
-        if (!token.getUser().getUsername().equals(userName)) {
-            throw new AccessDeniedException();
-        }
-        tokens.remove(theToken);
-    }
-
-    public String resolveToken(String theToken, String protectToken) {
-        final Token token = tokens.get(theToken);
-        if (token == null) {
-            throw new TokenNotFoundExistsException();
-        }
-        if (token.getProtectToken() != null && !token.getProtectToken().equals(protectToken)) {
-            throw new AccessDeniedException();
-        }
-
-        return token.getTargetUrl();
-    }
-
-    public Token getToken(String theToken, String username) {
-        if (username == null) {
-            throw new AccessDeniedException();
-        }
-        final Token token = tokens.get(theToken);
-        if (!token.getUser().getUsername().equals(username)) {
-            throw new AccessDeniedException();
-        }
-        return token;
-    }
+    return token;
+  }
 }
 ```
 
 Exceptions:
 
 ```java
-AccessDeniedException extends RuntimeException {...}
-IllegalTargetUrlException extends RuntimeException {...}
-IllegalTokenNameException extends RuntimeException {...}
-InvalidTargetUrlException extends RuntimeException {...}
-TokenAlreadyExistsException extends RuntimeException {...}
-TokenNotFoundExistsException extends RuntimeException {...}
-TokenTargetUrlIsNullException extends RuntimeException {...}
-UserExistsException extends RuntimeException {...}
+AccessDeniedException.java
+IllegalTargetUrlException.java
+IllegalTokenNameException.java
+InvalidTargetUrlException.java
+TokenAlreadyExistsException.java
+TokenNotFoundException.java
+TokenTargetUrlIsNullException.java
+UserExistsException.java
+UserNotFoundException.java
 ```
 
 
@@ -242,30 +243,33 @@ UserService:
 ```java
 @Service
 public class UserService {
-    @Autowired
-    private TokenService tokenService;
-    private HashMap<String, User> users = new HashMap<>();
+  @Autowired
+  private TokenService tokenService;
+  private HashMap<String, User> users = new HashMap<>();
 
-    public User create(String userName, String password) {
-        if (users.containsKey(userName)) {
-            throw new UserExistsException();
-        }
-        final User user = User.builder().username(userName).password(password).build();
-        users.put(userName, user);
-        return user;
+  public User create(String userName, String password) {
+    if (users.containsKey(userName)) {
+      throw new UserExistsException();
     }
+    final User user = User.builder().username(userName).password(password).build();
+    users.put(userName, user);
+    return user;
+  }
 
-    public void delete(String userName) {
-        final User user = users.get(userName);
-        if (user != null) {
-            users.remove(userName);
-            tokenService.deleteTokens(user);
-        }
+  public void delete(String userName) {
+    final User user = users.get(userName);
+    if (user != null) {
+      users.remove(userName);
+      tokenService.deleteTokens(user);
     }
+  }
 
-    public User getUser(String userName) {
-        return users.get(userName);
+  public User getUser(String userName) {
+    if (!users.containsKey(userName)) {
+      throw new UserNotFoundException();
     }
+    return users.get(userName);
+  }
 }
 ```
 
