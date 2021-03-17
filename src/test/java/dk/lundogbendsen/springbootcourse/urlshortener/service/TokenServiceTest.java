@@ -1,26 +1,19 @@
 package dk.lundogbendsen.springbootcourse.urlshortener.service;
 
-import dk.lundogbendsen.springbootcourse.urlshortener.model.Token;
 import dk.lundogbendsen.springbootcourse.urlshortener.model.User;
-import dk.lundogbendsen.springbootcourse.urlshortener.repositories.TokenRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
 import java.net.URL;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TokenServiceTest {
-    @Mock
-    TokenRepository tokenRepository;
     @InjectMocks
     TokenService tokenService;
     private User user = User.builder().username("username").password("password").build();
@@ -39,7 +32,7 @@ class TokenServiceTest {
     @DisplayName("create token that already exists (fails)")
     public void testCreateTokenThatAlreadExists() {
         try {
-            when(tokenRepository.findById("token1")).thenReturn(Optional.of(Token.builder().build()));
+            tokenService.create("token1", "https://dr.dk", null, user);
             tokenService.create("token1", "https://dr.dk", null, user);
             fail();
         } catch (Exception e) {

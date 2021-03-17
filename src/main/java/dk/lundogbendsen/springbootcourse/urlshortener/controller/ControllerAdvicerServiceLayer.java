@@ -22,10 +22,14 @@ public class ControllerAdvicerServiceLayer {
         }
     }
 
-    @ExceptionHandler({TokenNotFoundExistsException.class})
+    @ExceptionHandler({TokenNotFoundException.class, UserNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFound(TokenNotFoundExistsException exception) {
-        return Map.of("message", "The token was not found");
+    public Map<String, String> handleNotFound(TokenNotFoundException exception) {
+        if (exception instanceof TokenNotFoundException) {
+            return Map.of("message", "The token not found");
+        } else {
+            return Map.of("message", "The user not found");
+        }
     }
 
     @ExceptionHandler({IllegalTargetUrlException.class, IllegalTokenNameException.class, InvalidTargetUrlException.class, TokenTargetUrlIsNullException.class})

@@ -2,6 +2,7 @@ package dk.lundogbendsen.springbootcourse.urlshortener.service;
 
 import dk.lundogbendsen.springbootcourse.urlshortener.model.User;
 import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.UserExistsException;
+import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,9 @@ public class UserService {
     }
 
     public User getUser(String userName) {
+        if (!users.containsKey(userName)) {
+            throw new UserNotFoundException();
+        }
         return users.get(userName);
     }
 }
