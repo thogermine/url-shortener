@@ -13,7 +13,7 @@ public interface TokenRepository extends JpaRepository<Token, String> {
 
     void deleteAllByUser(User user);
 
-    void deleteByUser(String theToken, User user);
+    void deleteByTokenAndUser(String theToken, User user);
 
     Optional<Token> findByTokenAndProtectToken(String theToken, String protectToken);
 }

@@ -93,7 +93,7 @@ public class TokenService {
     }
 
     public void deleteToken(String theToken, User user) {
-        tokenRepository.deleteByUser(theToken, user);
+        tokenRepository.deleteByTokenAndUser(theToken, user);
     }
 
     public String resolveToken(String theToken, String protectToken) {
