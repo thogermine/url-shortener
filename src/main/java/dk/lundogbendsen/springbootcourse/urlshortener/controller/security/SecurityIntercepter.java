@@ -26,10 +26,15 @@ public class SecurityIntercepter implements HandlerInterceptor {
                 final String[] split = decoded.split(":");
                 String userName = split[0];
                 String password = split[1];
-                final User user = userService.getUser(userName);
-                if (user != null && user.getPassword().equals(password)) {
-                    SecurityContext.setUser(user);
-                } else {
+                final User user;
+                try {
+                    user = userService.getUser(userName);
+                    if (user.getPassword().equals(password)) {
+                        SecurityContext.setUser(user);
+                    } else {
+                        throw new AccessDeniedException();
+                    }
+                } catch (Exception e) {
                     throw new AccessDeniedException();
                 }
             } else if (auth.startsWith("Bearer")) {

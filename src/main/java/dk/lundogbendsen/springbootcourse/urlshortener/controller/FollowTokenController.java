@@ -1,5 +1,6 @@
 package dk.lundogbendsen.springbootcourse.urlshortener.controller;
 
+import dk.lundogbendsen.springbootcourse.urlshortener.controller.security.SecurityContext;
 import dk.lundogbendsen.springbootcourse.urlshortener.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -16,8 +17,8 @@ public class FollowTokenController {
     TokenService tokenService;
 
     @GetMapping("{token}")
-    public ResponseEntity<Object> follow(@PathVariable String token, @RequestHeader(required = false) String protectToken) {
-        final String targetUrl = tokenService.resolveToken(token, protectToken);
+    public ResponseEntity<Object> follow(@PathVariable String token) {
+        final String targetUrl = tokenService.resolveToken(token, SecurityContext.getProtectToken());
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header(HttpHeaders.LOCATION, targetUrl).build();
     }
 
