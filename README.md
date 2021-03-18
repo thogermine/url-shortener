@@ -7,8 +7,8 @@ It is not even a real springboot project since it lacks a class annotated with `
 
 ### Exercise 1: Make the project a Springboot web project
 - Include the starter-web in the pom.xml.
-- create a class in the namespace root and annotate it with @SpringBootApplication.
-- Also make a main method, that builds the Spring Application Context
+- Goto Application class in the namespace root and annotate it with @SpringBootApplication.
+- Also fill out the main method to build a Spring Application Context
     - Hint: `SpringApplication.run(ApiApplication.class, args);`
 - Run the main, and verify that it starts a webserver.
 
