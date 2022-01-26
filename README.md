@@ -6,10 +6,10 @@ The task is now to make inside server tests using MockMvc. The test should cover
 
 
 
-## Exercise 1: Test create User
-
+## Exercise 1: Prepare test environment for Testing UserController
 Test creation of a User. There are a few cases here. One where the User does not exists, and one where it already exists and an exception is thrown.
 Since we are not dependant on security, we can use Strategy 1 to create a Test-environment.
 
 * Create a Test class for testing UserController
 * Create a MockMvc standalone with UserController as test target.
+
