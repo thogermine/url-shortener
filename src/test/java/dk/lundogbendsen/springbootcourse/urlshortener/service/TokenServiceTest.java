@@ -1,10 +1,12 @@
 package dk.lundogbendsen.springbootcourse.urlshortener.service;
 
 import dk.lundogbendsen.springbootcourse.urlshortener.model.User;
+import dk.lundogbendsen.springbootcourse.urlshortener.repositories.TokenRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
@@ -14,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(MockitoExtension.class)
 class TokenServiceTest {
+    @Mock
+    TokenRepository tokenRepository;
     @InjectMocks
     TokenService tokenService;
     private User user = User.builder().username("username").password("password").build();

@@ -1,18 +1,26 @@
-# Exercises for build an API on Url-shortener
+# Exercises for testing the persistence layer in URLShortener.
 
-At this point we have a fully functional Microservice with API and Persistence and Tests.
+At this point we have a project implementing the business logic of the URLShortener. I uses MySql for persisting its 
+data and therefore data will remain through restarts of the service.
 
-Now it is time to play with coorporation between Microservices. 
+Now it is time for testing the Persistence Layer.
 
-The exercises here will enable coordination of state between the Microservices of all the course partisipants UrlShorteners.
+When testing the Persistence Layer, we don't actually want to test if Spring Repositories actually produces correct SQL.
 
-### Disclaimer 
-there are several issues in the approach taken in these exercises. First, you would not coordinate state like this between instances of the same Microservice. They would rely on access to the same database. Second, if an instance restarts, it looses any state coordination sent while it was down, and therefore its state would propably get out of sync very fast.
+Instead we want to make certain that the methods WE provide on the Repository Interfaces, and any custom sql that WE 
+have produced, actually works.
 
-BUT, we are here to have FUN, and Messaging is FUN. And as long as we are learning...
+Looking at the TokenRepository we have the following custom methods:
 
+```java
+public interface TokenRepository extends JpaRepository<Token, String> {
+    List<Token> findAllByUser(User user);
+    Optional<Token> findByTokenAndUser(String token, User user);
+    void deleteAllByUser(User user);
+    void deleteByTokenAndUser(String theToken, User user);
+    Optional<Token> findByTokenAndProtectToken(String theToken, String protectToken);
+}
+```
 
-### Exercise 1: Add the AMQP starter
-### Exercise 2: Start RabbitMQ
-### Exercise 3: In the Controller Layer: Stop calling the Service Layer - send a message!
-### Exercise 4: In the Service Layer: Consume messages and execute
+In java you can add any method on an interface. We should test that the methods we add to a repository
+follow the conventions of Spring. Otherwise nothing happens when we call that method.
