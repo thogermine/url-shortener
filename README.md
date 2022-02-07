@@ -2,7 +2,7 @@
 
 Until now we have been using Postman and Curl for ad hoc trying out new features of the REST API. 
 This situation is not ideal as it leaves room for Regression and it is cumbersome to test features this way,
-especially in the light of the Service Layer are using a Memory Database that gets wiped with every restart.
+especially in the light of the Service Layer using a Memory Database that gets wiped with every restart.
 
 In order to have a more systematic approach we will use Unit test for testing the API.
 
@@ -13,15 +13,20 @@ With Unit test we can choose between 4 different strategies:
 - Strategy 4: SpringBootTest (Full SpringBoot application with TestRestTemplate) / Real webserver
 
 The strategies are ordered from the simplest/fastest to the most complex/slowest. More complex strategies lessen the 
-burden of initializing the application, but tend to be slower. Also if not modified they are more like integration test
-instead of unit test.
+burden of initializing the application, but tend to be slower. Also if not modified in scope by using slices and componentscan 
+they are more like integration test instead of unit test.
 
-Choose the simplest strategy that reaches your goal of testing. For inspiration you can consult the 
-FollowControllerTest_S1 to _S4 and TokenControllerTest_S1 to _S4 that gives concrete working examples of using each
-of the strategies.
+Choose the simplest strategy that reaches your goal of testing. For inspiration you can consult the test classes in the
+package `dk/lundogbendsen/springbootcourse/urlshortener/controller` in the test folder. Here you'll find concrete working
+examples of using each of the strategies.
 
-The goals of these exercises are to cover the API in such a way that the postman collection `UrlShortener.postman_collection.json`
-is satisfied, and also cover some of the "odd-cases" that might arrive if business constraints are not met.
+The goal of these exercises is to cover the API in such a way that the postman collection `UrlShortener.postman_collection.json`
+is satisfied and also cover some of the "odd-cases" that might arrive if business constraints are not met.
+
+This is where you will have to use your imagination to create scenarioes and preconditions for each test case. Below 
+is listed headlines of many normal cases and odd-cases. You job is now to implement those. If your tests are green, 
+the postman collection should be able to run smoothly afterwords.
+
 
 ## User CRUD:
 
