@@ -62,10 +62,119 @@ Special attention must be given to the followToken. This is where the whole busi
 - send a location header with the targetUrl of the token.
 - the Token can be protected by a "protectToken", so you should support the client providing one _if required_.
 
-#### Solution
-See: src/main/java/dk/lundogbendsen/springbootcourse/urlshortener/controller/UserController.java
-See: src/main/java/dk/lundogbendsen/springbootcourse/urlshortener/controller/TokenController.java
-See: src/main/java/dk/lundogbendsen/springbootcourse/urlshortener/controller/FollowTokenController.java
+#### Solution (3 controllers)
+
+**src/main/java/dk/lundogbendsen/springbootcourse/urlshortener/controller/UserController.java**
+
+```java
+package dk.lundogbendsen.springbootcourse.urlshortener.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+    @Autowired
+    UserService userService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public User createUser(@RequestBody User user) {
+        return userService.create(user.getUsername(), user.getPassword());
+    }
+
+    @GetMapping("{userName}")
+    public User getUser(@PathVariable String userName) {
+        return userService.getUser(userName);
+    }
+
+    @DeleteMapping("{userName}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable String userName) {
+        userService.delete(userName);
+    }
+}
+
+```
+
+**src/main/java/dk/lundogbendsen/springbootcourse/urlshortener/controller/TokenController.java**
+```java
+package dk.lundogbendsen.springbootcourse.urlshortener.controller;
+
+
+@RestController
+@RequestMapping("/token")
+public class TokenController {
+    @Autowired
+    TokenService tokenService;
+    @Autowired
+    UserService userService;
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<Token> list(@RequestHeader String username) {
+        final User user = userService.getUser(username);
+        return tokenService.listUserTokens(user);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void create(@RequestBody Map<String, String> body, @RequestHeader String username) {
+        final User user = userService.getUser(username);
+        final String token = body.get("token");
+        final String targetUrl = body.get("targetUrl");
+        final String protectToken = body.get("protectToken");
+        tokenService.create(token, targetUrl, protectToken, user);
+    }
+
+    @PutMapping("/{token}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void update(@PathVariable String token, @RequestBody Map<String, String> body, @RequestHeader String username) {
+        final User user = userService.getUser(username);
+        final String targetUrl = body.get("targetUrl");
+        final String protectToken = body.get("protectToken");
+        tokenService.update(token, targetUrl, protectToken, user);
+    }
+
+    @DeleteMapping("/{token}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable String token, @RequestHeader String username) {
+        tokenService.deleteToken(token, username);
+    }
+
+    @PutMapping("/{token}/protect")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void protect(@PathVariable("token") String theToken, @RequestBody Map<String, String> body, @RequestHeader String username) {
+        final User user = userService.getUser(username);
+        final Token token = tokenService.getToken(theToken, username);
+        String protectToken = body.get("protectToken");
+        tokenService.update(theToken, token.getTargetUrl(), protectToken, user);
+    }
+}
+
+```
+
+**src/main/java/dk/lundogbendsen/springbootcourse/urlshortener/controller/FollowTokenController.java**
+
+```java
+package dk.lundogbendsen.springbootcourse.urlshortener.controller;
+
+
+@RestController
+public class FollowTokenController {
+    @Autowired
+    TokenService tokenService;
+
+    @GetMapping("{token}")
+    public ResponseEntity<Object> follow(@PathVariable String token, @RequestHeader(required = false) String protectToken) {
+        final String targetUrl = tokenService.resolveToken(token, protectToken);
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header(HttpHeaders.LOCATION, targetUrl).build();
+    }
+
+}
+
+```
 
 ### Exercise 3: Exception handling for Service Layer
 At this point we have a working API, but error handling could be better.
@@ -209,12 +318,6 @@ We also need to clean up after the request is handled.
 ```java
 package dk.lundogbendsen.springbootcourse.urlshortener.controller.security;
 
-import dk.lundogbendsen.springbootcourse.urlshortener.model.User;
-import dk.lundogbendsen.springbootcourse.urlshortener.service.UserService;
-import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.AccessDeniedException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
