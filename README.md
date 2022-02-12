@@ -20,12 +20,12 @@ Choose the simplest strategy that reaches your goal of testing. For inspiration 
 package `dk/lundogbendsen/springbootcourse/urlshortener/controller` in the test folder. Here you'll find concrete working
 examples of using each of the strategies.
 
-The goal of these exercises is to cover the API in such a way that the postman collection `UrlShortener.postman_collection.json`
+The goal of these exercises is to cover the API in such a way that the postman collection `UrlShortener v2.postman_collection.json`
 is satisfied and also cover some of the "odd-cases" that might arrive if business constraints are not met.
 
 This is where you will have to use your imagination to create scenarioes and preconditions for each test case. Below 
 is listed headlines of many normal cases and odd-cases. You job is now to implement those. If your tests are green, 
-the postman collection should be able to run smoothly afterwords.
+the postman collection should be able to run smoothly afterwards.
 
 
 ## User CRUD:

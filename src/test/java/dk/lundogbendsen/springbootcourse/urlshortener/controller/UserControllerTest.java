@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
     MockMvc mvc;
+
     @Mock
     UserService userService;
 
@@ -34,7 +35,7 @@ public class UserControllerTest {
 
     @Test
     public void testCreateUser() throws Exception {
-        when(userService.create(any(), any())).thenReturn(User.builder().username("cvw").password("pwsd").build());
+        when(userService.create(any(), any())).thenReturn(User.builder().username("cvw").password("pwd").build());
         mvc.perform(
                         MockMvcRequestBuilders.post("/user")
                                 .contentType(MediaType.APPLICATION_JSON)
