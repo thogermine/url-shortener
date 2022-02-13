@@ -28,12 +28,45 @@ is listed headlines of many normal cases and odd-cases. You job is now to implem
 the postman collection should be able to run smoothly afterwards.
 
 
+## Inspiration
+
+The following exercises are without solutions, but there are 2 inspirational test classes that illustrate most of what 
+you need.
+
+**dk/lundogbendsen/springbootcourse/urlshortener/controller/InspirationalUserControllerTest.java**
+
+Show how you can use Mockity to test the Controller Layer.
+
+**dk/lundogbendsen/springbootcourse/urlshortener/controller/InspirationalSecurityTest.java** 
+
+Shows how you could user @SpringBootTest to test the security part of the API.
+
+Mind that you have a free choice of @SpringBootTest and Mockito. They have equivalent capabilities. It's a matter of
+style, comfort and preference...
+
+
+
 ## User CRUD:
 
 ### Exercise: Create User
+
+Should return 200 and the user created
+
 ### Exercise: Create User that already exists
+
+Must setup a canned answer in the UserService that is the same as the user, you are trying to create.
+
+Should throw an exception. And a certain status code.
+
 ### Exercise: List Users
+
+Setup a canned answer of a couple of users. 
+
+Should return a list of those users.
+
 ### Exercise: Get User
+
+
 ### Exercise: Get User that does not exist
 ### Exercise: Delete User
 ### Exercise: Delete User that does not exist
