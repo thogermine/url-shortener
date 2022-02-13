@@ -33,11 +33,11 @@ the postman collection should be able to run smoothly afterwards.
 The following exercises are without solutions, but there are 2 inspirational test classes that illustrate most of what 
 you need.
 
-**dk/lundogbendsen/springbootcourse/urlshortener/controller/InspirationalUserControllerTest.java**
+**InspirationalUserControllerTest.java**
 
 Show how you can use Mockity to test the Controller Layer.
 
-**dk/lundogbendsen/springbootcourse/urlshortener/controller/InspirationalSecurityTest.java** 
+**InspirationalSecurityTest.java** 
 
 Shows how you could user @SpringBootTest to test the security part of the API.
 
