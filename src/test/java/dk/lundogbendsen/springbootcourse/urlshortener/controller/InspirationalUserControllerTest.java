@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+public class InspirationalUserControllerTest {
     MockMvc mvc;
 
     @Mock
