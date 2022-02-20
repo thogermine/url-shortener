@@ -1,17 +1,18 @@
 package dk.lundogbendsen.springbootcourse.urlshortener.service;
 
 import dk.lundogbendsen.springbootcourse.urlshortener.model.User;
-import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.IllegalTargetUrlException;
-import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.IllegalTokenNameException;
-import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.InvalidTargetUrlException;
-import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.TokenTargetUrlIsNullException;
+import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.URI;
+import java.net.URL;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @ExtendWith(MockitoExtension.class)
 class TokenServiceTest {
@@ -29,12 +30,13 @@ class TokenServiceTest {
     @DisplayName("create token that already exists (fails)")
     public void testCreateTokenThatAlreadExists() {
         tokenService.create("token1", "https://dr.dk", null, user);
+        assertThrows(TokenAlreadyExistsException.class, () -> tokenService.create("token1", "https://dr.dk", null, user));
     }
 
     @Test
     @DisplayName("create token without a targetUrl (fails)")
     public void testCreateTokenWithoutTargetUrl() {
-        assertThrows(TokenTargetUrlIsNullException.class, () -> tokenService.create("token1", null, null, user));
+            assertThrows(TokenTargetUrlIsNullException.class, () -> tokenService.create("token1", null, null, user));
     }
 
     @Test
