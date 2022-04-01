@@ -2,28 +2,52 @@
 
 At this point, the service layer does not have true persistence. When the application shuts down, all data are gone.
 
-These exercises will bring persistence to MySql.
+These exercises will bring persistence to H2 Embedded Database.
 
+It is possible to connect to the H2 database using a browser if the property
 
-### Exercise 1: Add data jpa and mysql connector
+`spring.h2.console.enabled=true`
+
+Hit the console in a browser: `localhost:8080/h2-console`
+
+Also we want to exploit the devtools to avoid constant restart of application while we develop.
+
+### Exercise 1: Add data jpa and h2 connector
 
 - Add to pom.xml two dependencies:
     1. the data-jpa springboot starter (gives us Repositories and JPA annotations)
-    2. the mysql-connector-java dependency (Add a Mysql datasource).
-
+    2. the H2 dependency (Adds a H2 datasource).
+    3. the spring-boot-devtools dependency
+    4. the web starter dependency (for accessing h2 console)
+- Add the following properties to use H2:
+```
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
+```
 Hint: you can use a shortcut in the pom for making Intellij find the dependency: ctrl-n (or right-click and "generate")
 
 #### Solution
 pom.xml:
-```java
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-jpa</artifactId>
-</dependency>
-<dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-</dependency>
+```xml
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-devtools</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <scope>runtime</scope>
+    </dependency>
 ```
 
 
