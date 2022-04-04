@@ -120,21 +120,21 @@ public class TokenController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@RequestBody Map<String, String> body, @RequestHeader String username) {
+    public Token create(@RequestBody Map<String, String> body, @RequestHeader String username) {
         final User user = userService.getUser(username);
         final String token = body.get("token");
         final String targetUrl = body.get("targetUrl");
         final String protectToken = body.get("protectToken");
-        tokenService.create(token, targetUrl, protectToken, user);
+        return tokenService.create(token, targetUrl, protectToken, user);
     }
 
     @PutMapping("/{token}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@PathVariable String token, @RequestBody Map<String, String> body, @RequestHeader String username) {
+    public Token update(@PathVariable String token, @RequestBody Map<String, String> body, @RequestHeader String username) {
         final User user = userService.getUser(username);
         final String targetUrl = body.get("targetUrl");
         final String protectToken = body.get("protectToken");
-        tokenService.update(token, targetUrl, protectToken, user);
+        return tokenService.update(token, targetUrl, protectToken, user);
     }
 
     @DeleteMapping("/{token}")
@@ -145,11 +145,11 @@ public class TokenController {
 
     @PutMapping("/{token}/protect")
     @ResponseStatus(HttpStatus.CREATED)
-    public void protect(@PathVariable("token") String theToken, @RequestBody Map<String, String> body, @RequestHeader String username) {
+    public Token protect(@PathVariable("token") String theToken, @RequestBody Map<String, String> body, @RequestHeader String username) {
         final User user = userService.getUser(username);
         final Token token = tokenService.getToken(theToken, username);
         String protectToken = body.get("protectToken");
-        tokenService.update(theToken, token.getTargetUrl(), protectToken, user);
+        return tokenService.update(theToken, token.getTargetUrl(), protectToken, user);
     }
 }
 
