@@ -27,19 +27,19 @@ public class TokenController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@RequestBody Map<String, String> body) {
+    public Token create(@RequestBody Map<String, String> body) {
         final String token = body.get("token");
         final String targetUrl = body.get("targetUrl");
         final String protectToken = body.get("protectToken");
-        tokenService.create(token, targetUrl, protectToken, SecurityContext.getUser());
+        return tokenService.create(token, targetUrl, protectToken, SecurityContext.getUser());
     }
 
     @PutMapping("/{token}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@PathVariable String token, @RequestBody Map<String, String> body) {
+    public Token update(@PathVariable String token, @RequestBody Map<String, String> body) {
         final String targetUrl = body.get("targetUrl");
         final String protectToken = body.get("protectToken");
-        tokenService.update(token, targetUrl, protectToken, SecurityContext.getUser());
+        return tokenService.update(token, targetUrl, protectToken, SecurityContext.getUser());
     }
 
     @DeleteMapping("/{token}")
@@ -50,9 +50,9 @@ public class TokenController {
 
     @PutMapping("/{token}/protect")
     @ResponseStatus(HttpStatus.CREATED)
-    public void protect(@PathVariable("token") String theToken, @RequestBody Map<String, String> body) {
+    public Token protect(@PathVariable("token") String theToken, @RequestBody Map<String, String> body) {
         final Token token = tokenService.getToken(theToken, SecurityContext.getUser());
         String protectToken = body.get("protectToken");
-        tokenService.update(theToken, token.getTargetUrl(), protectToken, SecurityContext.getUser());
+        return tokenService.update(theToken, token.getTargetUrl(), protectToken, SecurityContext.getUser());
     }
 }
