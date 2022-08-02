@@ -41,13 +41,13 @@ Make an API that exposes each method in the service layer.
 - Make a UserController with path prefix "/user" and the following operations:
   - createUser() (status code 201)
   - deleteUser() (status code 204)
-  - listUsers()
+  - getUser()
 
 - Make a TokenController with path prefix "/token" and the following operations:
   - createToken() (status code 201)
   - getToken()
   - deleteToken() (status code 204)
-  - listToken()
+  - listTokens()
   - updateToken()
 
 - Make a TokenController with path prefix "/" and the following operations:
