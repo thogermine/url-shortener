@@ -9,7 +9,7 @@ Now it is time for testing the service layer.
 - In the src folder make a test/java folder (two folders).
 
 ### Exercise 2: Preparing the Test of the UserService
-The UserService have a dependency on TokenService. Therefore we must find a way to mock that dependency.
+The UserService have a dependency on TokenService. Therefore, we must find a way to mock that dependency.
 
 - Goto UserService and generate a test for the service.
 Hint: Bring up the Generate menu with Ctrl-N and select test...

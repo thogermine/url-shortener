@@ -50,7 +50,7 @@ Make an API that exposes each method in the service layer.
   - listTokens()
   - updateToken()
 
-- Make a TokenController with path prefix "/" and the following operations:
+- Make a TokenFollowController with path prefix "/" and the following operations:
   - followToken() (status code 301)
 
 Beware of the Security constraints of the Service Layer: Token operations can only be performed by the User owning the tokens.
