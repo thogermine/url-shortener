@@ -3,6 +3,9 @@ package dk.lundogbendsen.springbootcourse.urlshortener.service;
 import dk.lundogbendsen.springbootcourse.urlshortener.model.Token;
 import dk.lundogbendsen.springbootcourse.urlshortener.model.User;
 import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.*;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.net.MalformedURLException;
@@ -17,26 +20,20 @@ import java.util.stream.Collectors;
 public class TokenService {
     private HashMap<String, Token> tokens = new HashMap<>();
 
-
-    public List<Token> listUserTokens(User user) {
-        if (user == null) {
-            throw new AccessDeniedException();
-        }
+    public List<Token> listUserTokens() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         final List<Token> userTokens = this.tokens.values().stream().filter(token -> token.getUser().getUsername().equals(user.getUsername())).collect(Collectors.toUnmodifiableList());
         return userTokens;
     }
 
-    public void deleteTokens(User user) {
-        if (user == null) {
-            throw new AccessDeniedException();
-        }
+    public void deleteTokens() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        User user  = (User) context.getAuthentication().getPrincipal();
+
         tokens.values().removeIf(token -> token.getUser().getUsername().equals(user.getUsername()));
     }
 
-    public Token create(String theToken, String targetUrl, String protectToken, User user) {
-        if (user == null) {
-            throw new AccessDeniedException();
-        }
+    public Token create(String theToken, String targetUrl) {
         if (theToken.equals("token")) {
             throw new IllegalTokenNameException();
         }
@@ -54,16 +51,16 @@ public class TokenService {
         } catch (MalformedURLException e) {
             throw new InvalidTargetUrlException();
         }
-
-        final Token token = Token.builder().token(theToken).targetUrl(targetUrl).protectToken(protectToken).user(user).build();
+        SecurityContext context = SecurityContextHolder.getContext();
+        User user  = (User) context.getAuthentication().getPrincipal();
+        final Token token = Token.builder().token(theToken).targetUrl(targetUrl).user(user).build();
         tokens.put(theToken, token);
         return token;
     }
 
-    public Token update(String theToken, String targetUrl, String protectToken, User user) {
-        if (user == null) {
-            throw new AccessDeniedException();
-        }
+    public Token update(String theToken, String targetUrl) {
+        SecurityContext context = SecurityContextHolder.getContext();
+        User user  = (User) context.getAuthentication().getPrincipal();
         final Token token = tokens.get(theToken);
         if (token == null) {
             throw new TokenNotFoundException();
@@ -83,14 +80,12 @@ public class TokenService {
             throw new InvalidTargetUrlException();
         }
         token.setTargetUrl(targetUrl);
-        token.setProtectToken(protectToken);
         return token;
     }
 
-    public void deleteToken(String theToken, User user) {
-        if (user == null) {
-            throw new AccessDeniedException();
-        }
+    public void deleteToken(String theToken) {
+        SecurityContext context = SecurityContextHolder.getContext();
+        User user  = (User) context.getAuthentication().getPrincipal();
         final Token token = tokens.get(theToken);
         if (!token.getUser().getUsername().equals(user.getUsername())) {
             throw new AccessDeniedException();
@@ -98,22 +93,17 @@ public class TokenService {
         tokens.remove(theToken);
     }
 
-    public String resolveToken(String theToken, String protectToken) {
+    public String resolveToken(String theToken) {
         final Token token = tokens.get(theToken);
         if (token == null) {
             throw new TokenNotFoundException();
         }
-        if (token.getProtectToken() != null && !token.getProtectToken().equals(protectToken)) {
-            throw new AccessDeniedException();
-        }
-
         return token.getTargetUrl();
     }
 
-    public Token getToken(String theToken, User user) {
-        if (user == null) {
-            throw new AccessDeniedException();
-        }
+    public Token getToken(String theToken) {
+        SecurityContext context = SecurityContextHolder.getContext();
+        User user  = (User) context.getAuthentication().getPrincipal();
         final Token token = tokens.get(theToken);
         if (!token.getUser().getUsername().equals(user.getUsername())) {
             throw new AccessDeniedException();

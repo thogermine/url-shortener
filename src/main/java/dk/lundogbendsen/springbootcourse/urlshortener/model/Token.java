@@ -7,7 +7,6 @@ import lombok.Data;
 @Builder
 public class Token {
     String token;
-    String protectToken;
     String targetUrl;
     User user;
 }

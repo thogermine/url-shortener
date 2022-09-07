@@ -4,9 +4,17 @@ import dk.lundogbendsen.springbootcourse.urlshortener.model.User;
 import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.UserExistsException;
 import dk.lundogbendsen.springbootcourse.urlshortener.service.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -14,27 +22,26 @@ public class UserService {
     private TokenService tokenService;
     private HashMap<String, User> users = new HashMap<>();
 
-    public User create(String userName, String password) {
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    public User create(String userName, String password, List<String> roles) {
         if (users.containsKey(userName)) {
             throw new UserExistsException();
         }
-        final User user = User.builder().username(userName).password(password).build();
+        final User user = User.builder().username(userName).password(passwordEncoder.encode(password)).roles(roles).build();
         users.put(userName, user);
         return user;
     }
 
-    public void delete(String userName) {
-        final User user = users.get(userName);
-        if (user != null) {
-            users.remove(userName);
-            tokenService.deleteTokens(user);
-        }
+    public void delete() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        User user  = (User) context.getAuthentication().getPrincipal();
+        users.remove(user.getUsername());
+        tokenService.deleteTokens();
+        SecurityContextHolder.clearContext();
     }
 
     public User getUser(String userName) {
-        if (!users.containsKey(userName)) {
-            throw new UserNotFoundException();
-        }
         return users.get(userName);
     }
 }

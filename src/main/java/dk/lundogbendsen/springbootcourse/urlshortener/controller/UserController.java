@@ -4,6 +4,8 @@ import dk.lundogbendsen.springbootcourse.urlshortener.model.User;
 import dk.lundogbendsen.springbootcourse.urlshortener.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,17 +17,20 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody User user) {
-        return userService.create(user.getUsername(), user.getPassword());
+        return userService.create(user.getUsername(), user.getPassword(), user.getRoles());
     }
 
-    @GetMapping("{userName}")
-    public User getUser(@PathVariable String userName) {
-        return userService.getUser(userName);
+    @GetMapping
+    public User getUser()
+    {
+        SecurityContext context = SecurityContextHolder.getContext();
+        User user  = (User) context.getAuthentication().getPrincipal();
+        return user;
     }
 
-    @DeleteMapping("{userName}")
+    @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable String userName) {
-        userService.delete(userName);
+    public void deleteUser() {
+        userService.delete();
     }
 }

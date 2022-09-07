@@ -1,6 +1,5 @@
 package dk.lundogbendsen.springbootcourse.urlshortener.controller;
 
-import dk.lundogbendsen.springbootcourse.urlshortener.controller.security.SecurityContext;
 import dk.lundogbendsen.springbootcourse.urlshortener.model.Token;
 import dk.lundogbendsen.springbootcourse.urlshortener.service.TokenService;
 import dk.lundogbendsen.springbootcourse.urlshortener.service.UserService;
@@ -22,7 +21,7 @@ public class TokenController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<Token> list() {
-        return tokenService.listUserTokens(SecurityContext.getUser());
+        return tokenService.listUserTokens();
     }
 
     @PostMapping
@@ -31,7 +30,7 @@ public class TokenController {
         final String token = body.get("token");
         final String targetUrl = body.get("targetUrl");
         final String protectToken = body.get("protectToken");
-        return tokenService.create(token, targetUrl, protectToken, SecurityContext.getUser());
+        return tokenService.create(token, targetUrl);
     }
 
     @PutMapping("/{token}")
@@ -39,20 +38,13 @@ public class TokenController {
     public Token update(@PathVariable String token, @RequestBody Map<String, String> body) {
         final String targetUrl = body.get("targetUrl");
         final String protectToken = body.get("protectToken");
-        return tokenService.update(token, targetUrl, protectToken, SecurityContext.getUser());
+        return tokenService.update(token, targetUrl);
     }
 
     @DeleteMapping("/{token}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String token) {
-        tokenService.deleteToken(token, SecurityContext.getUser());
+        tokenService.deleteToken(token);
     }
 
-    @PutMapping("/{token}/protect")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Token protect(@PathVariable("token") String theToken, @RequestBody Map<String, String> body) {
-        final Token token = tokenService.getToken(theToken, SecurityContext.getUser());
-        String protectToken = body.get("protectToken");
-        return tokenService.update(theToken, token.getTargetUrl(), protectToken, SecurityContext.getUser());
-    }
 }
