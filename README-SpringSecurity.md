@@ -170,7 +170,7 @@ Update the getUser() method to pull the authenticated user from the SecurityCont
 #### Solution:
 ```java
 public class SecurityContext {
-    ...
+    // ...
     public static User getUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
@@ -213,6 +213,8 @@ Find an appropriate class to implement this interface and add a user to the data
 ```java
 @Service
 public class UserService implements InitializingBean {
+    // ...
+
     @Override
     public void afterPropertiesSet() throws Exception {
         create("user", "password");
