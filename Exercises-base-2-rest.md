@@ -194,6 +194,21 @@ Inspecting the Exceptions from the business layer, we could categorize them into
 
 Import the postman collection: `UrlShortener v1.postman_collection.json`
 
+As an alternativ - if you are using Intellij Ultimate, you can use the built-in REST client and load the [urlshortener-v1.http](urlshortener-v1.http)
+
+If none of these options suits you, you can use the Swagger documentation of the API to test it. Add the following dependency to your pom.xml:
+
+```xml
+<dependency>
+  <groupId>org.springdoc</groupId>
+  <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+  <version>2.2.0</version>
+</dependency>
+```
+
+Open a browser on http://localhost:8080/swagger-ui.html
+
+
 Use it to test that your solution works!
 
 
