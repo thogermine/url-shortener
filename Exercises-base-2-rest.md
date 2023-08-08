@@ -137,7 +137,8 @@ public class TokenController {
     @DeleteMapping("/{token}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String token, @RequestHeader String username) {
-        tokenService.deleteToken(token, username);
+        final User user = userService.getUser(username);
+        tokenService.deleteToken(token, user);
     }
 
     @PutMapping("/{token}/protect")
