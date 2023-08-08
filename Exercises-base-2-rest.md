@@ -75,7 +75,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody User user) {
         return userService.create(user.getUsername(), user.getPassword());
@@ -108,14 +108,14 @@ public class TokenController {
     @Autowired
     UserService userService;
 
-    @GetMapping
+    @GetMapping("/")
     @ResponseStatus(HttpStatus.OK)
     public List<Token> list(@RequestHeader String username) {
         final User user = userService.getUser(username);
         return tokenService.listUserTokens(user);
     }
 
-    @PostMapping
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public Token create(@RequestBody Map<String, String> body, @RequestHeader String username) {
         final User user = userService.getUser(username);
@@ -137,7 +137,8 @@ public class TokenController {
     @DeleteMapping("/{token}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String token, @RequestHeader String username) {
-        tokenService.deleteToken(token, username);
+        final User user = userService.getUser(username);
+        tokenService.deleteToken(token, user);
     }
 
     @PutMapping("/{token}/protect")
@@ -193,6 +194,21 @@ Inspecting the Exceptions from the business layer, we could categorize them into
 
 
 Import the postman collection: `UrlShortener v1.postman_collection.json`
+
+As an alternativ - if you are using Intellij Ultimate, you can use the built-in REST client and load the [urlshortener-v1.http](urlshortener-v1.http)
+
+If none of these options suits you, you can use the Swagger documentation of the API to test it. Add the following dependency to your pom.xml:
+
+```xml
+<dependency>
+  <groupId>org.springdoc</groupId>
+  <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+  <version>2.2.0</version>
+</dependency>
+```
+
+Open a browser on http://localhost:8080/swagger-ui.html
+
 
 Use it to test that your solution works!
 
@@ -436,13 +452,13 @@ public class TokenController {
   @Autowired
   UserService userService;
 
-  @GetMapping
+  @GetMapping("/")
   @ResponseStatus(HttpStatus.OK)
   public List<Token> list() {
     return tokenService.listUserTokens(SecurityContext.getUser());
   }
 
-  @PostMapping
+  @PostMapping("/")
   @ResponseStatus(HttpStatus.CREATED)
   public void create(@RequestBody Map<String, String> body) {
     final String token = body.get("token");
