@@ -75,7 +75,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody User user) {
         return userService.create(user.getUsername(), user.getPassword());
@@ -108,14 +108,14 @@ public class TokenController {
     @Autowired
     UserService userService;
 
-    @GetMapping
+    @GetMapping("/")
     @ResponseStatus(HttpStatus.OK)
     public List<Token> list(@RequestHeader String username) {
         final User user = userService.getUser(username);
         return tokenService.listUserTokens(user);
     }
 
-    @PostMapping
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public Token create(@RequestBody Map<String, String> body, @RequestHeader String username) {
         final User user = userService.getUser(username);
@@ -452,13 +452,13 @@ public class TokenController {
   @Autowired
   UserService userService;
 
-  @GetMapping
+  @GetMapping("/")
   @ResponseStatus(HttpStatus.OK)
   public List<Token> list() {
     return tokenService.listUserTokens(SecurityContext.getUser());
   }
 
-  @PostMapping
+  @PostMapping("/")
   @ResponseStatus(HttpStatus.CREATED)
   public void create(@RequestBody Map<String, String> body) {
     final String token = body.get("token");
